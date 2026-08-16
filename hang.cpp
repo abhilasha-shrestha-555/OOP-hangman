@@ -2,110 +2,114 @@
 #include <string>
 using namespace std;
 
-// Function to display the hangman
-void drawHangman(int wrong) {
-    cout << "\n";
-    cout << "  |   |\n";
+// ABSTRACTION 
+class Game {
+public:  
+virtual void drawHangman(int wrong) = 0; // pure virtual function
+};
 
-    if (wrong >= 1)
-        cout << "  O   |\n";
-    else
-        cout << "      |\n";
+// INHERITANCE
+// HangmanGame inherits from Game
+class HangmanGame : public Game {
 
-    if (wrong == 2)
-        cout << "  |   |\n";
-    else if (wrong == 3)
-        cout << " /|   |\n";
-    else if (wrong >= 4)
-        cout << " /|\\  |\n";
-    else
-        cout << "      |\n";
+private:
+// ENCAPSULATION
+string word;
+string display;
+char guess;
+int attempts;
+char correct;
 
-    if (wrong == 5)
-        cout << " /    |\n";
-    else if (wrong >= 6)
-        cout << " / \\  |\n";
-    else
-        cout << "      |\n";
-
-    cout << "      |\n";
-    cout << "=========\n";
+public:
+// CONSTRUCTOR
+HangmanGame() {
+word = "pink";
+display = "____";
+attempts = 5;
+correct = false;
 }
 
-// Function to check if a letter is already guessed
-bool alreadyGuessed(char letter, string guessed) {
-    for (char c : guessed) {
-        if (c == letter)
-            return true;
-    }
-    return false;
+// POLYMORPHISM
+// this function overrides the function from Game
+void drawHangman(int wrong) override {
+cout << "\n";
+cout << "  -----\n";
+cout << "  |   |\n";
+if (wrong >= 1)
+cout << "  O   |\n";
+else
+cout << "      |\n";
+if (wrong == 2)
+cout << "  |   |\n";
+else if (wrong == 3)
+cout << " /|   |\n";
+else if (wrong >= 4)
+cout << " /|\\  |\n";
+else
+cout << "      |\n";
+if (wrong >= 5)
+cout << " / \\  |\n";
+else
+cout << "      |\n";
+cout << "      |\n";
 }
 
+// function to play the game
+void playGame() {
+cout << "\n";
+cout << "    HANGMAN GAME\n";
+
+while (attempts > 0) {
+
+// to show the hangman
+drawHangman(5 - attempts);
+
+cout << "\nword: " << display << "\n";
+cout << "enter a letter: ";
+cin >> guess;
+
+// to reset correct for every new guess
+correct = false;
+
+// to check the guessed letter
+for (int i = 0; i < word.length(); i++) {
+
+if (word[i] == guess) {
+display[i] = guess;
+correct = true;
+}
+}
+if (correct) {
+cout << "correct yayy!\n";
+}
+else {
+cout << "wrong haha!\n";
+attempts--;
+cout << "attempts left: " << attempts << "\n";
+}
+
+// to check if the whole word has been guessed
+if (word == display) {
+cout << "\nYOU WON WOOHOO!!\n";
+cout << "the word is: " << word << "\n";
+return;
+}
+}
+
+// final hangman
+    drawHangman(5);
+    cout << "\nGAME OVER LOSER BOO!\n";
+    cout << "the word is: " << word << "\n";
+}          
+};  
+
+// MAIN FUNCTION
 int main() {
 
-    string word = "computer";
-    string guessedWord = "________";
-    string guessedLetters = "";
+// to create an object
+HangmanGame game;
 
-    int wrong = 0;
-    const int maxWrong = 6;
-
-    cout << "      HANGMAN GAME\n";
-
-    while (wrong < maxWrong && guessedWord != word) {
-
-        drawHangman(wrong);
-
-        cout << "\nWord: ";
-        for (char c : guessedWord)
-            cout << c << " ";
-
-        cout << "\nGuessed letters: " << guessedLetters;
-        cout << "\nWrong guesses left: " << maxWrong - wrong;
-
-        char guess;
-        cout << "\n\nEnter a letter: ";
-        cin >> guess;
-
-        // Convert uppercase to lowercase
-        if (guess >= 'A' && guess <= 'Z')
-            guess = guess + 32;
-
-        // Check if letter was already guessed
-        if (alreadyGuessed(guess, guessedLetters)) {
-            cout << "You already guessed that letter!\n";
-            continue;
-        }
-
-        guessedLetters += guess;
-
-        bool found = false;
-
-        // Check the word
-        for (int i = 0; i < word.length(); i++) {
-            if (word[i] == guess) {
-                guessedWord[i] = guess;
-                found = true;
-            }
-        }
-
-        if (found) {
-            cout << "Correct guess!\n";
-        } else {
-            cout << "Wrong guess!\n";
-            wrong++;
-        }
-    }
-
-    drawHangman(wrong);
-
-    if (guessedWord == word) {
-        cout << "\n🎉 YOU WIN!\n";
-        cout << "The word was: " << word << endl;
-    } else {
-        cout << "\n💀 GAME OVER!\n";
-        cout << "The word was: " << word << endl;
-    }
-
-    return 0;
+// to start the game
+game.playGame();
+return 0;
 }
